@@ -79,7 +79,7 @@ export default function LoginScreen() {
             <Text style={styles.inputLabel}>Usuario</Text>
             <TextInput
               style={[styles.textInput, error ? styles.inputError : null]}
-              placeholder="Tu usuario USC"
+              placeholder=""
               placeholderTextColor="#a0a0a0"
               value={username}
               onChangeText={(text) => { setUsername(text); setError(''); }}
@@ -93,7 +93,7 @@ export default function LoginScreen() {
             <Text style={styles.inputLabel}>Contraseña</Text>
             <TextInput
               style={[styles.textInput, error ? styles.inputError : null]}
-              placeholder="Tu contraseña"
+              placeholder=""
               placeholderTextColor="#a0a0a0"
               value={password}
               onChangeText={(text) => { setPassword(text); setError(''); }}
@@ -123,9 +123,9 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           {/* Solo para pruebas — borrar antes de entregar */}
-          <Text style={styles.testHint}>
-            🧪 Prueba: usuario <Text style={{ fontWeight: 'bold' }}>estudiante</Text> / clave <Text style={{ fontWeight: 'bold' }}>1234</Text>
-          </Text>
+          {/*<Text style={styles.testHint}>
+            {/*🧪 Prueba: usuario <Text style={{ fontWeight: 'bold' }}>estudiante</Text> / clave <Text style={{ fontWeight: 'bold' }}>1234</Text>
+          {/*</Text> Solo para pruebas — borrar antes de entregar */}
         </View>
 
         <Text style={styles.footer}>

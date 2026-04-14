@@ -29,7 +29,7 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
   // ════════════════════════════════════════════════════════════════════
   await delay(800);
 
-  if (credentials.username === 'estudiante' && credentials.password === '1234') {
+  if (credentials.username === '1234' && credentials.password === '5678') {
     return {
       token: 'mock-jwt-token-campusquest-usc',
       user: {
