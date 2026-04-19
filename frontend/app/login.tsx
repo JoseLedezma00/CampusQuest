@@ -1,36 +1,54 @@
 // app/login.tsx
 // Pantalla de Login — CampusQuest
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView,
-} from 'react-native';
-import { router } from 'expo-router';
-import { login } from '../services/auth.service';
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
+import { router } from "expo-router";
+import { login } from "../services/auth.service";
 
-const USC_BLUE       = '#003087';
-const USC_GREEN      = '#00843D';
-const USC_LIGHT_BLUE = '#E8F0FE';
+const USC_BLUE = "#003087";
+const USC_GREEN = "#00843D";
+const USC_LIGHT_BLUE = "#E8F0FE";
 
 export default function LoginScreen() {
-  const [codigo, setCodigo]       = useState('');
-  const [password, setPassword]   = useState('');
+  const [codigo, setCodigo] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError]         = useState('');
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     if (!codigo.trim() || !password.trim()) {
-      setError('Por favor completa todos los campos.');
+      setError("Por favor completa todos los campos.");
       return;
     }
-    setError('');
+
+    setError("");
     setIsLoading(true);
+
     try {
-      await login({ username: codigo.trim(), password });
-      router.replace('/mapa');
+      const result = await login({ username: codigo.trim(), password });
+
+      // ✅ Pasa los datos del usuario a la pantalla de bienvenida
+      router.replace({
+        pathname: "/bienvenida",
+        params: {
+          nombre: result.usuario?.nombre || "Estudiante",
+          codigo: codigo.trim(),
+        },
+      });
     } catch (err: any) {
-      const message = err.response?.data?.message || 'Error de conexión. Verifica tu internet.';
+      // ✅ Muestra el mensaje de error del backend
+      const message = err.message || "Error de conexión. Verifica tu internet.";
       setError(message);
     } finally {
       setIsLoading(false);
@@ -39,7 +57,7 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
       <ScrollView
@@ -52,9 +70,13 @@ export default function LoginScreen() {
           <View style={styles.logoPlaceholder}>
             <Text style={styles.logoEmoji}>🎓</Text>
           </View>
-          <Text style={styles.universityName}>Universidad{'\n'}Santiago de Cali</Text>
+          <Text style={styles.universityName}>
+            Universidad{"\n"}Santiago de Cali
+          </Text>
           <Text style={styles.appTitle}>CampusQuest</Text>
-          <Text style={styles.appSubtitle}>Gymkhana Institucional · Citadela Pampalinda</Text>
+          <Text style={styles.appSubtitle}>
+            Gymkhana Institucional · Citadela Pampalinda
+          </Text>
         </View>
 
         {/* Formulario */}
@@ -68,7 +90,10 @@ export default function LoginScreen() {
               placeholder="Tu código de estudiante"
               placeholderTextColor="#a0a0a0"
               value={codigo}
-              onChangeText={(t) => { setCodigo(t); setError(''); }}
+              onChangeText={(t) => {
+                setCodigo(t);
+                setError("");
+              }}
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="next"
@@ -82,8 +107,17 @@ export default function LoginScreen() {
               placeholder="Tu contraseña"
               placeholderTextColor="#a0a0a0"
               value={password}
-              onChangeText={(t) => { setPassword(t); setError(''); }}
-              secureTextEntry
+              onChangeText={(t) => {
+                setPassword(t);
+                setError("");
+              }}
+              // 🔑 Props clave para password estable:
+              secureTextEntry={true} // ← Siempre true, no condicional
+              textContentType="password" // ← Ayuda a iOS con autofill
+              autoCorrect={false} // ← Sin correcciones
+              autoCapitalize="none" // ← Sin mayúsculas automáticas
+              spellCheck={false} // ← Sin corrector ortográfico
+              autoComplete="password" // ← Estándar para password
               returnKeyType="done"
               onSubmitEditing={handleLogin}
             />
@@ -101,25 +135,28 @@ export default function LoginScreen() {
             disabled={isLoading}
             activeOpacity={0.8}
           >
-            {isLoading
-              ? <ActivityIndicator color="#FFFFFF" size="small" />
-              : <Text style={styles.loginButtonText}>Entrar al Campus</Text>
-            }
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={styles.loginButtonText}>Entrar al Campus</Text>
+            )}
           </TouchableOpacity>
 
           {/* Enlace a registro */}
           <TouchableOpacity
             style={styles.registerLink}
-            onPress={() => router.push('/registro')}
+            onPress={() => router.push("/registro")}
           >
             <Text style={styles.registerLinkText}>
-              ¿No tienes cuenta?{' '}
+              ¿No tienes cuenta?{" "}
               <Text style={styles.registerLinkBold}>Regístrate</Text>
             </Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.footer}>Facultad de Ingeniería · USC · Cali, Colombia</Text>
+        <Text style={styles.footer}>
+          Facultad de Ingeniería · USC · Cali, Colombia
+        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -128,55 +165,118 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: USC_BLUE },
   scrollContent: {
-    flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 40,
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 40,
   },
-  logoSection: { alignItems: 'center', marginBottom: 32 },
+  logoSection: { alignItems: "center", marginBottom: 32 },
   logoPlaceholder: {
-    width: 100, height: 100, borderRadius: 50,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    justifyContent: 'center', alignItems: 'center',
-    marginBottom: 16, borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.3)",
   },
   logoEmoji: { fontSize: 48 },
   universityName: {
-    fontSize: 20, fontWeight: '700', color: '#FFFFFF',
-    textAlign: 'center', lineHeight: 26, letterSpacing: 0.5,
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    textAlign: "center",
+    lineHeight: 26,
+    letterSpacing: 0.5,
   },
-  appTitle: { fontSize: 32, fontWeight: '900', color: '#FFFFFF', marginTop: 8, letterSpacing: 1 },
-  appSubtitle: { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 4, textAlign: 'center' },
+  appTitle: {
+    fontSize: 32,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    marginTop: 8,
+    letterSpacing: 1,
+  },
+  appSubtitle: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 4,
+    textAlign: "center",
+  },
   formCard: {
-    backgroundColor: '#FFFFFF', borderRadius: 20, padding: 28,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15, shadowRadius: 12, elevation: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 28,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  formTitle: { fontSize: 22, fontWeight: '700', color: USC_BLUE, marginBottom: 24, textAlign: 'center' },
+  formTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: USC_BLUE,
+    marginBottom: 24,
+    textAlign: "center",
+  },
   inputGroup: { marginBottom: 16 },
   inputLabel: {
-    fontSize: 13, fontWeight: '600', color: '#555',
-    marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5,
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#555",
+    marginBottom: 6,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   textInput: {
-    height: 52, borderWidth: 1.5, borderColor: '#DDE3F0', borderRadius: 12,
-    paddingHorizontal: 16, fontSize: 16, color: '#1a1a2e', backgroundColor: USC_LIGHT_BLUE,
+    height: 52,
+    borderWidth: 1.5,
+    borderColor: "#DDE3F0",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: "#1a1a2e",
+    backgroundColor: USC_LIGHT_BLUE,
   },
-  inputError: { borderColor: '#E53935', backgroundColor: '#FFF5F5' },
+  inputError: { borderColor: "#E53935", backgroundColor: "#FFF5F5" },
   errorBox: {
-    backgroundColor: '#FFF3F3', borderLeftWidth: 3, borderLeftColor: '#E53935',
-    borderRadius: 8, padding: 10, marginBottom: 12,
+    backgroundColor: "#FFF3F3",
+    borderLeftWidth: 3,
+    borderLeftColor: "#E53935",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 12,
   },
-  errorText: { color: '#C62828', fontSize: 13, fontWeight: '500' },
+  errorText: { color: "#C62828", fontSize: 13, fontWeight: "500" },
   loginButton: {
-    backgroundColor: USC_GREEN, height: 52, borderRadius: 12,
-    justifyContent: 'center', alignItems: 'center', marginTop: 8,
-    shadowColor: USC_GREEN, shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3, shadowRadius: 8, elevation: 4,
+    backgroundColor: USC_GREEN,
+    height: 52,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+    shadowColor: USC_GREEN,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   buttonDisabled: { opacity: 0.6 },
-  loginButtonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700', letterSpacing: 0.5 },
-  registerLink: { marginTop: 20, alignItems: 'center' },
-  registerLinkText: { fontSize: 14, color: '#888' },
-  registerLinkBold: { color: USC_BLUE, fontWeight: '700' },
+  loginButtonText: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  registerLink: { marginTop: 20, alignItems: "center" },
+  registerLinkText: { fontSize: 14, color: "#888" },
+  registerLinkBold: { color: USC_BLUE, fontWeight: "700" },
   footer: {
-    textAlign: 'center', color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 24,
+    textAlign: "center",
+    color: "rgba(255,255,255,0.5)",
+    fontSize: 11,
+    marginTop: 24,
   },
 });
