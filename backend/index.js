@@ -19,7 +19,7 @@ app.use('/api/estaciones', require('./routes/estaciones'));
 app.use('/api/usuarios', require('./routes/usuarios'));
 
 // 5. Definir puerto y arrancar servidor
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8081;
 
 app.listen(PORT, () => {
     console.log(`🚀 Servidor de CampusQuest corriendo en el puerto ${PORT}`);
